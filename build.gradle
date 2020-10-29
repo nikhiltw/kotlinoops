@@ -1,0 +1,23 @@
+plugins {
+    id 'org.jetbrains.kotlin.jvm' version '1.4.10'
+}
+group = 'me.nikhilsoni'
+version = '1.0-SNAPSHOT'
+
+repositories {
+    mavenCentral()
+}
+
+tasks.test {
+    useJUnitPlatform()
+}
+
+dependencies {
+    testImplementation 'org.jetbrains.kotlin:kotlin-test-junit5'
+    testCompile group: 'org.mockito', name: 'mockito-core', version: '3.6.0'
+
+}
+
+compileKotlin {
+    kotlinOptions.jvmTarget = '13'
+}
