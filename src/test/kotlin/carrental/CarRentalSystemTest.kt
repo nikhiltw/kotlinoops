@@ -21,16 +21,21 @@ internal class CarRentalSystemTest {
     @Test
     fun bookCarSuccess() {
         val priceCalculator = PriceCalculator()
+        val paymentSystem = PaymentSystem(priceCalculator)
 
-        val carRentalSystem = CarRentalSystem(inventory, priceCalculator)
+        val carRentalSystem = CarRentalSystem(inventory)
+        carRentalSystem.add(paymentSystem)
 
         val car = carRentalSystem.browseCars().first { it.carType == CarType.FOUR_WHEELER }
         val user = User(1)
 
         val tripID = carRentalSystem.createTrip(user, car)
-        carRentalSystem.startTrip(tripID)
 
-        val invoice = carRentalSystem.endTrip(tripID)
+        carRentalSystem.startTrip(tripID)
+        carRentalSystem.endTrip(tripID)
+
+        val invoice = paymentSystem.getInvoice()
+
         assertEquals("Total: 1440.0", invoice.toString())
     }
 
@@ -38,7 +43,7 @@ internal class CarRentalSystemTest {
     fun bookCarFailureWhenCreateTripFails() {
         val priceCalculator = PriceCalculator()
 
-        val carRentalSystem = CarRentalSystem(inventory, priceCalculator)
+        val carRentalSystem = CarRentalSystem(inventory)
 
         val car = carRentalSystem.browseCars().first { it.carType == CarType.FOUR_WHEELER }
         val user = User(1)
@@ -49,21 +54,19 @@ internal class CarRentalSystemTest {
 
     @Test
     fun bookCarFailureWhenStartTripFailsForInvalidId() {
-        val carRentalSystem = CarRentalSystem(inventory, PriceCalculator())
+        val carRentalSystem = CarRentalSystem(inventory)
         assertThrows(IllegalArgumentException::class.java) { carRentalSystem.startTrip("invalidID") }
     }
 
     @Test
     fun bookCarFailureWhenEndTripFailsForInvalidId() {
-        val carRentalSystem = CarRentalSystem(inventory, PriceCalculator())
+        val carRentalSystem = CarRentalSystem(inventory)
         assertThrows(IllegalArgumentException::class.java) { carRentalSystem.endTrip("invalidID") }
     }
 
     @Test
     fun bookCarFailureWhenEndTripFailsBeforeStartingTrip() {
-        val priceCalculator = PriceCalculator()
-
-        val carRentalSystem = CarRentalSystem(inventory, priceCalculator)
+        val carRentalSystem = CarRentalSystem(inventory)
 
         val car = carRentalSystem.browseCars().first { it.carType == CarType.FOUR_WHEELER }
         val user = User(1)

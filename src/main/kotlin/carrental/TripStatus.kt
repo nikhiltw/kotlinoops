@@ -1,23 +1,16 @@
 package carrental
 
 enum class TripStatus {
-    CREATED {
-        override fun next(): TripStatus {
-            return IN_PROGRESS
-        }
-    },
+    CREATED, IN_PROGRESS, COMPLETED;
 
-    IN_PROGRESS {
-        override fun next(): TripStatus {
-            return COMPLETED
-        }
-    },
+    fun toInProgress(): TripStatus {
+        if (this != CREATED) throw UnsupportedOperationException("cannot start this trip")
+        return IN_PROGRESS
+    }
 
-    COMPLETED {
-        override fun next(): TripStatus {
-            throw UnsupportedOperationException("trip is completed")
-        }
-    };
+    fun toEnd(): TripStatus {
+        if (this != IN_PROGRESS) throw UnsupportedOperationException("cannot end this trip")
+        return COMPLETED
+    }
 
-    abstract fun next(): TripStatus
 }

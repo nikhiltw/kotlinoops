@@ -1,8 +1,11 @@
 package carrental
 
-class CarRentalSystem(private val inventory: Inventory, private val priceCalculator: PriceCalculator) {
+import java.time.Duration
+
+class CarRentalSystem(private val inventory: Inventory) : Observable {
 
     private val trips: MutableMap<String, Trip> = mutableMapOf()
+    private val observers: MutableList<Observer> = mutableListOf()
 
     fun browseCars(): List<Car> {
         return inventory.getAvailableCars()
@@ -24,14 +27,21 @@ class CarRentalSystem(private val inventory: Inventory, private val priceCalcula
         trip.start()
     }
 
-    fun endTrip(tripID: String): Invoice {
+    fun endTrip(tripID: String) {
         val trip = trips[tripID] ?: throw IllegalArgumentException("invalid trip id")
 
         inventory.unMarkAsBooked(trip.car)
-
         val duration = trip.end()
-        val total = priceCalculator.calculate(duration, trip.car.carType)
-        return Invoice(total)
+
+        notify(duration, trip.car.carType)
+    }
+
+    override fun add(observer: Observer) {
+        observers.add(observer)
+    }
+
+    override fun notify(duration: Duration, carType: CarType) {
+        observers.forEach { it.update(duration, carType) }
     }
 
 }

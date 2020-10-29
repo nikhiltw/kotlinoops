@@ -7,10 +7,13 @@ internal class TripStatusTest {
 
     @Test
     fun testNext() {
-        assertEquals(TripStatus.IN_PROGRESS, TripStatus.CREATED.next())
-        assertEquals(TripStatus.COMPLETED, TripStatus.IN_PROGRESS.next())
+        assertEquals(TripStatus.IN_PROGRESS, TripStatus.CREATED.toInProgress())
+        assertEquals(TripStatus.COMPLETED, TripStatus.IN_PROGRESS.toEnd())
 
-        assertThrows(UnsupportedOperationException::class.java) { TripStatus.COMPLETED.next() }
+        assertThrows(UnsupportedOperationException::class.java) { TripStatus.IN_PROGRESS.toInProgress() }
+        assertThrows(UnsupportedOperationException::class.java) { TripStatus.CREATED.toEnd() }
+        assertThrows(UnsupportedOperationException::class.java) { TripStatus.COMPLETED.toInProgress() }
+        assertThrows(UnsupportedOperationException::class.java) { TripStatus.COMPLETED.toEnd() }
     }
 
 }
